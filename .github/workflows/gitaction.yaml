@@ -19,7 +19,9 @@ jobs:
       - name: Check Files
       -  id: files
       -  uses: jitterbit/get-changed-files@v1
-      -  run: |
+
+      - name: Output
+      - run: |
           for changed_file in ${{ steps.files.outputs.all }}; do
             echo "Do something with this ${changed_file}." > nc_report.log 2>&1
           done
