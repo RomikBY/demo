@@ -1,12 +1,12 @@
-name: Check remote host and push report
+name: Check modified files
 
 on:
-  push:
+  pull_request:
     branches:
     - main 
 
 jobs:
-  prepare:
+  check-files:
     runs-on: ubuntu-latest 
     steps:
       - name: Get
@@ -17,26 +17,11 @@ jobs:
 
       - name: Check Files
         run: |
-          readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
-          for removed_file in ${removed_files[@]}; do
-            echo "Removed files: ${removed_file}." >> check_file_report.log
+          readarray -t changed_file <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.all }}')"
+          for changed_file in ${changed_file[@]}; do
+            echo "Removed files: ${changed_file}." >> check_file_report.log
           done
-      - run: |
-          readarray -t modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.modified }}')"
-          for modified_file in ${modified_files[@]}; do
-            echo "Modified files: ${modified_file}." >> check_file_report.log
-          done
-      - run: |
-          readarray -t added_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added }}')"
-          for added_file in ${added_files[@]}; do
-            echo "Added files: ${added_file}." >> check_file_report.log
-          done
-      - run: |
-          readarray -t renamed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.renamed }}')"
-          for renamed_file in ${renamed_files[@]}; do
-            echo "renamed files: ${renamed_file}." >> check_file_report.log
-          done
-
+      
       - name: Upload report
         uses: actions/upload-artifact@v2
         with:
