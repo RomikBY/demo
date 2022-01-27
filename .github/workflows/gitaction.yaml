@@ -9,7 +9,7 @@ jobs:
   prepare:
     runs-on: ubuntu-latest 
     steps:
-      - name: Get Changed
+      - name: Get
         id: files
         uses: jitterbit/get-changed-files@v1
         with:
