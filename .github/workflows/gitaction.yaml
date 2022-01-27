@@ -13,8 +13,8 @@ jobs:
       - name: Check Files
         id: files
         uses: jitterbit/get-changed-files@v1
-        with:
-          format: 'json'
+#        with:
+#          format: 'json'
 
       - run: |
           readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
