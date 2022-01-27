@@ -14,27 +14,51 @@ jobs:
         uses: jitterbit/get-changed-files@v1
         with:
           format: 'json'
-        - run: |
-          readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
-          for removed_file in ${removed_files[@]}; do
-            echo "Removed files: ${removed_file}." >> check_file_report.log
-          done
-        - run: |
-          readarray -t modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.modified }}')"
-          for modified_file in ${modified_files[@]}; do
-            echo "Modified files: ${modified_file}." >> check_file_report.log
-          done
-        - run: |
-          readarray -t added_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added }}')"
-          for added_file in ${added_files[@]}; do
-            echo "Added files: ${added_file}." >> check_file_report.log
-          done
-        - run: |
-          readarray -t renamed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.renamed }}')"
-          for renamed_file in ${renamed_files[@]}; do
-            echo "renamed files: ${renamed_file}." >> check_file_report.log
-          done          
+
+        run: |
+        readarray -t removed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.removed }}')"
+        for removed_file in ${removed_files[@]}; do
+          echo "Removed files: ${removed_file}." >> check_file_report.log
+        done
+      - run: |
+        readarray -t modified_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.modified }}')"
+        for modified_file in ${modified_files[@]}; do
+          echo "Modified files: ${modified_file}." >> check_file_report.log
+        done
+      - run: |
+        readarray -t added_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.added }}')"
+        for added_file in ${added_files[@]}; do
+          echo "Added files: ${added_file}." >> check_file_report.log
+        done
+      - run: |
+        readarray -t renamed_files <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.renamed }}')"
+        for renamed_file in ${renamed_files[@]}; do
+          echo "renamed files: ${renamed_file}." >> check_file_report.log
+        done
+
       - name: Upload report
         uses: actions/upload-artifact@v2
         with:
           path: check_file_report.log
+
+name: Check remote host and push report
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install netcat
+        run: sudo apt update && sudo apt install -y netcat
+      - run: echo "netcat has been installed"
+      - run: |
+          nc -z -v -w2 onliner.by 443 > nc_report.log 2>&1
+          ls -la
+      - name: Upload report
+        uses: actions/upload-artifact@v2
+        with:
+          path: nc_report.log
