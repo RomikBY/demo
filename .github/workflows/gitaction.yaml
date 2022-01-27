@@ -19,7 +19,7 @@ jobs:
         run: |
           readarray -t changed_file <<<"$(jq -r '.[]' <<<'${{ steps.files.outputs.all }}')"
           for changed_file in ${changed_file[@]}; do
-            echo "Removed files: ${changed_file}." >> check_file_report.log
+            echo "Changed files: ${changed_file}." >> check_file_report.log
           done
       
       - name: Upload report
